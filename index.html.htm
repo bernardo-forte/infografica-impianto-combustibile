@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camera di Combustione nelle Turbine a Gas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #2e3a50;
+    --bg2: #354458;
+    --surface: #3d4f68;
+    --surface2: #465a78;
+    --border: #5a7090;
+    --accent: #ff6b2b;
+    --accent2: #ffa040;
+    --accent3: #ffcc55;
+    --blue: #3d9be9;
+    --blue2: #60c0ff;
+    --teal: #2de0c0;
+    --text: #e8edf5;
+    --text2: #a0aabf;
+    --text3: #6a7590;
+    --glow: rgba(255,107,43,0.15);
+    --glow2: rgba(61,155,233,0.12);
+    --radius: 12px;
+    --radius-lg: 20px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Crimson Pro', Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* === ANIMATED BACKGROUND === */
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(61,155,233,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(61,155,233,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .bg-glow-1 {
+    position: fixed; top: -200px; left: -200px; width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(255,107,43,0.08) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+    animation: floatGlow 8s ease-in-out infinite;
+  }
+  .bg-glow-2 {
+    position: fixed; bottom: -200px; right: -200px; width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(61,155,233,0.07) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+    animation: floatGlow 10s ease-in-out infinite reverse;
+  }
+  @keyframes floatGlow {
+    0%, 100% { transform: translate(0,0); }
+    50% { transform: translate(30px, 20px); }
+  }
+
+  /* === HEADER === */
+  header {
+    position: relative; z-index: 10;
+    text-align: center;
+    padding: 70px 20px 50px;
+    overflow: hidden;
+  }
+  .header-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px; font-weight: 600; letter-spacing: 4px;
+    color: var(--accent); text-transform: uppercase;
+    margin-bottom: 18px;
+    display: inline-block;
+    border: 1px solid rgba(255,107,43,0.3);
+    padding: 5px 14px; border-radius: 20px;
+    background: rgba(255,107,43,0.06);
+    animation: fadeSlideDown 0.8s ease both;
+  }
+  h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    font-weight: 700; line-height: 1.1;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    animation: fadeSlideDown 0.8s 0.1s ease both;
+  }
+  h1 span { color: var(--accent); }
+  .header-sub {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--text2); margin-top: 16px; max-width: 600px; margin-inline: auto;
+    font-weight: 300; line-height: 1.7;
+    animation: fadeSlideDown 0.8s 0.2s ease both;
+  }
+  .header-line {
+    width: 80px; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    margin: 30px auto 0;
+    animation: fadeSlideDown 0.8s 0.3s ease both;
+    border-radius: 2px;
+  }
+  .header-student {
+    margin-top: 20px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    animation: fadeSlideDown 0.8s 0.4s ease both;
+  }
+  .student-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem; font-weight: 600; letter-spacing: 1.5px;
+    color: var(--text);
+  }
+  .student-sep { color: var(--text3); font-size: 1rem; }
+  .student-class {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem; font-weight: 500; letter-spacing: 1px;
+    color: var(--accent2);
+    background: rgba(255,160,64,0.1);
+    border: 1px solid rgba(255,160,64,0.25);
+    padding: 2px 10px; border-radius: 20px;
+  }
+
+  /* === MAIN INFOGRAPHIC SVG BANNER === */
+  .infographic-banner {
+    position: relative; z-index: 5;
+    max-width: 960px; margin: 0 auto 60px;
+    padding: 0 20px;
+    animation: fadeSlideUp 1s 0.4s ease both;
+  }
+  .banner-svg-wrap {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  /* === CARDS GRID === */
+  .section-title {
+    position: relative; z-index: 5;
+    text-align: center; margin-bottom: 40px; padding: 0 20px;
+    animation: fadeSlideUp 1s 0.5s ease both;
+  }
+  .section-title h2 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(1.3rem, 3vw, 1.9rem); font-weight: 600;
+    letter-spacing: 1px; color: var(--text2); text-transform: uppercase;
+  }
+  .section-title h2 span { color: var(--blue2); }
+
+  .cards-grid {
+    position: relative; z-index: 5;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto 80px;
+    padding: 0 20px;
+  }
+
+  .card {
+    background: linear-gradient(145deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px 24px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    animation: fadeSlideUp 0.8s ease both;
+  }
+  .card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--glow), transparent 60%);
+    opacity: 0; transition: opacity 0.3s ease;
+    border-radius: inherit;
+  }
+  .card:hover { transform: translateY(-6px); border-color: var(--accent); }
+  .card:hover::before { opacity: 1; }
+  .card:hover { box-shadow: 0 16px 48px rgba(255,107,43,0.15), 0 0 0 1px rgba(255,107,43,0.2); }
+
+  .card.blue:hover { border-color: var(--blue); box-shadow: 0 16px 48px rgba(61,155,233,0.15), 0 0 0 1px rgba(61,155,233,0.2); }
+  .card.blue::before { background: linear-gradient(135deg, var(--glow2), transparent 60%); }
+  .card.teal:hover { border-color: var(--teal); box-shadow: 0 16px 48px rgba(45,224,192,0.12), 0 0 0 1px rgba(45,224,192,0.2); }
+  .card.teal::before { background: linear-gradient(135deg, rgba(45,224,192,0.08), transparent 60%); }
+
+  .card-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px; font-size: 22px;
+    background: rgba(255,107,43,0.12); border: 1px solid rgba(255,107,43,0.2);
+  }
+  .card.blue .card-icon { background: rgba(61,155,233,0.12); border-color: rgba(61,155,233,0.2); }
+  .card.teal .card-icon { background: rgba(45,224,192,0.1); border-color: rgba(45,224,192,0.2); }
+
+  .card-tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 8px;
+  }
+  .card.blue .card-tag { color: var(--blue2); }
+  .card.teal .card-tag { color: var(--teal); }
+
+  .card h3 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.25rem; font-weight: 600; line-height: 1.3;
+    margin-bottom: 10px; color: var(--text);
+  }
+  .card p {
+    font-size: 0.95rem; color: var(--text2); line-height: 1.65;
+  }
+  .card-arrow {
+    position: absolute; bottom: 20px; right: 22px;
+    font-size: 18px; color: var(--text3);
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+  .card:hover .card-arrow { transform: translateX(4px); color: var(--accent); }
+  .card.blue:hover .card-arrow { color: var(--blue2); }
+  .card.teal:hover .card-arrow { color: var(--teal); }
+
+  /* Italiano & Inglese card variants */
+  .card.italiano:hover { border-color: #c060e0; box-shadow: 0 16px 48px rgba(180,80,200,0.15), 0 0 0 1px rgba(180,80,200,0.2); }
+  .card.italiano::before { background: linear-gradient(135deg, rgba(180,80,200,0.09), transparent 60%); }
+  .card.italiano:hover .card-arrow { color: #c060e0; }
+  .card.inglese:hover { border-color: #40c880; box-shadow: 0 16px 48px rgba(40,180,100,0.14), 0 0 0 1px rgba(40,180,100,0.2); }
+  .card.inglese::before { background: linear-gradient(135deg, rgba(40,180,100,0.08), transparent 60%); }
+  .card.inglese:hover .card-arrow { color: #40c880; }
+
+  /* Maturità divider */
+  .maturita-section {
+    position: relative; z-index: 5;
+    max-width: 1100px; margin: 20px auto 0; padding: 0 20px 10px;
+  }
+  .maturita-badge {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 14px;
+  }
+  .maturita-badge-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(180,80,200,0.5), rgba(40,180,100,0.5), transparent);
+  }
+  .maturita-badge-text {
+    display: flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, rgba(180,80,200,0.1), rgba(40,180,100,0.08));
+    border: 1px solid rgba(180,80,200,0.3);
+    border-radius: 30px; padding: 8px 22px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 2.5px;
+    text-transform: uppercase; color: #c898e0; white-space: nowrap;
+  }
+  .maturita-sub {
+    text-align: center; color: var(--text2);
+    font-size: 1rem; line-height: 1.7;
+    max-width: 640px; margin: 0 auto 36px;
+    font-style: italic;
+  }
+
+  /* Quote block */
+  .quote-block {
+    border-left: 3px solid #c060e0;
+    background: rgba(180,80,200,0.06);
+    border-radius: 0 12px 12px 0;
+    padding: 16px 22px; margin: 16px 0;
+    font-style: italic; font-size: 1.05rem;
+    color: var(--text2); line-height: 1.8;
+  }
+  .quote-block cite {
+    display: block; margin-top: 8px;
+    font-style: normal; font-size: 0.85rem;
+    color: var(--text3); font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;
+  }
+
+  /* English vocab */
+  .vocab-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin: 16px 0;
+  }
+  @media(max-width:500px){ .vocab-grid { grid-template-columns: 1fr; } }
+  .vocab-item {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  }
+  .vocab-en { font-family:'Rajdhani',sans-serif; font-weight:700; color:#40c880; font-size:0.95rem; min-width:110px; }
+  .vocab-it { font-size:0.9rem; color:var(--text2); }
+
+  .en-example {
+    background: rgba(40,180,100,0.06);
+    border: 1px solid rgba(40,180,100,0.2);
+    border-left: 3px solid #40c880;
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px; margin: 14px 0;
+    font-size: 0.97rem; color: var(--text2); line-height: 1.75;
+  }
+  .en-example .en-src {
+    font-family:'Rajdhani',sans-serif; font-size:10px;
+    letter-spacing:2px; text-transform:uppercase;
+    color:#40c880; margin-bottom:6px; font-weight:600;
+  }
+
+  /* Schema collegamento */
+  .collegamento-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+    gap: 12px; margin: 18px 0;
+  }
+  .coll-item {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 12px; text-align: center;
+  }
+  .coll-item .coll-icon { font-size: 1.5rem; margin-bottom: 6px; }
+  .coll-item .coll-label { font-family:'Rajdhani',sans-serif; font-size:0.85rem; font-weight:600; color:var(--text2); }
+  .coll-item .coll-sub { font-size:0.78rem; color:var(--text3); margin-top:4px; line-height:1.4; }
+
+  /* === MODAL === */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(5,7,12,0.92);
+    backdrop-filter: blur(12px);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 30px 16px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.35s ease;
+    overflow-y: auto;
+  }
+  .modal-overlay.active { opacity: 1; pointer-events: all; }
+  .modal {
+    background: linear-gradient(160deg, #2a3548 0%, #222e40 100%);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    max-width: 860px; width: 100%;
+    padding: 44px 44px 50px;
+    position: relative;
+    transform: translateY(30px) scale(0.97);
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .modal-overlay.active .modal { transform: translateY(0) scale(1); }
+
+  .modal-close {
+    position: absolute; top: 18px; right: 18px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text2); font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+  }
+  .modal-close:hover { background: var(--accent); color: white; transform: rotate(90deg); }
+
+  .modal-header-tag {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px;
+  }
+  .modal h2 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 700;
+    line-height: 1.15; margin-bottom: 20px;
+    color: var(--text);
+  }
+  .modal-divider {
+    width: 100%; height: 1px;
+    background: linear-gradient(90deg, var(--accent), var(--blue), transparent);
+    margin-bottom: 28px; opacity: 0.5;
+  }
+
+  .modal-body h3 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.15rem; font-weight: 600; letter-spacing: 0.5px;
+    color: var(--accent2); margin: 28px 0 10px;
+    text-transform: uppercase; font-size: 0.9rem;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .modal-body h3::before {
+    content: ''; display: inline-block;
+    width: 18px; height: 2px;
+    background: var(--accent2); border-radius: 2px;
+  }
+  .modal-body p {
+    font-size: 1.05rem; color: var(--text2); line-height: 1.8; margin-bottom: 14px;
+  }
+  .modal-body ul {
+    padding-left: 0; list-style: none; margin-bottom: 16px;
+  }
+  .modal-body ul li {
+    font-size: 1rem; color: var(--text2); line-height: 1.7; padding-left: 22px;
+    position: relative; margin-bottom: 8px;
+  }
+  .modal-body ul li::before {
+    content: '→'; position: absolute; left: 0;
+    color: var(--accent); font-size: 13px;
+  }
+
+  .formula-box {
+    background: linear-gradient(135deg, rgba(61,155,233,0.07), rgba(45,224,192,0.05));
+    border: 1px solid rgba(61,155,233,0.25);
+    border-radius: 12px; padding: 20px 24px; margin: 18px 0;
+    font-family: 'Rajdhani', monospace;
+  }
+  .formula-box .formula-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--blue2); margin-bottom: 10px; font-weight: 600;
+  }
+  .formula-box .formula-main {
+    font-size: 1.15rem; color: var(--text); line-height: 1.8;
+    font-family: 'Crimson Pro', serif;
+  }
+  .formula-box .formula-note {
+    font-size: 0.88rem; color: var(--text3); margin-top: 8px; line-height: 1.6;
+  }
+
+  .example-box {
+    background: linear-gradient(135deg, rgba(255,107,43,0.07), rgba(255,160,64,0.04));
+    border: 1px solid rgba(255,107,43,0.25);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 12px 12px 0; padding: 18px 22px; margin: 18px 0;
+  }
+  .example-box .ex-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 8px; font-weight: 600;
+  }
+  .example-box p {
+    font-size: 0.95rem; color: var(--text2); line-height: 1.7; margin: 0;
+  }
+
+  .data-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px; margin: 18px 0;
+  }
+  .data-cell {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px; text-align: center;
+  }
+  .data-cell .val {
+    font-family: 'Rajdhani', sans-serif; font-size: 1.4rem; font-weight: 700;
+    color: var(--accent2); display: block; margin-bottom: 4px;
+  }
+  .data-cell .lbl {
+    font-size: 0.8rem; color: var(--text3); line-height: 1.4;
+  }
+
+  /* SVG inline styles */
+  .svg-wrap {
+    margin: 20px 0; border-radius: 12px; overflow: hidden;
+    background: var(--surface2); border: 1px solid var(--border);
+  }
+
+  /* === ANIMATIONS === */
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(25px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card:nth-child(1) { animation-delay: 0.55s; }
+  .card:nth-child(2) { animation-delay: 0.65s; }
+  .card:nth-child(3) { animation-delay: 0.75s; }
+  .card:nth-child(4) { animation-delay: 0.85s; }
+  .card:nth-child(5) { animation-delay: 0.95s; }
+  .card:nth-child(6) { animation-delay: 1.05s; }
+
+  /* === FOOTER === */
+  footer {
+    position: relative; z-index: 5; text-align: center;
+    padding: 30px 20px; border-top: 1px solid var(--border);
+    color: var(--text3); font-size: 0.85rem; letter-spacing: 0.5px;
+  }
+
+  /* === SCROLLBAR === */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 640px) {
+    .modal { padding: 28px 22px 36px; }
+    .modal h2 { font-size: 1.5rem; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .data-grid { grid-template-columns: repeat(2,1fr); }
+  }
+
+  /* Highlight */
+  .hi { color: var(--accent2); font-style: italic; }
+  .hi-blue { color: var(--blue2); }
+  .hi-teal { color: var(--teal); }
+
+  /* Zone badge */
+  .zone-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-family: 'Rajdhani', sans-serif; font-size: 0.82rem; font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .zone-primary { background: rgba(255,100,50,0.15); color: #ff7a50; border: 1px solid rgba(255,100,50,0.3); }
+  .zone-secondary { background: rgba(255,180,50,0.12); color: #ffb830; border: 1px solid rgba(255,180,50,0.3); }
+  .zone-dilution { background: rgba(61,155,233,0.12); color: var(--blue2); border: 1px solid rgba(61,155,233,0.3); }
+
+  .separator { margin: 24px 0; border: none; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow-1"></div>
+<div class="bg-glow-2"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-label">Meccanica dei Sistemi Propulsivi</div>
+  <h1>Anatomia e Funzionamento della<br><span>Camera di Combustione</span></h1>
+  <p class="header-sub">Nelle turbine a gas aeronautiche e industriali — struttura, termodinamica, componenti e combustibili</p>
+  <div class="header-line"></div>
+  <div class="header-student">
+    <span class="student-name">Bernardo Forte</span>
+    <span class="student-sep">·</span>
+    <span class="student-class">5° Aca</span>
+  </div>
+</header>
+
+<!-- MAIN SVG BANNER -->
+<div class="infographic-banner">
+  <div class="banner-svg-wrap">
+    <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" width="100%" style="display:block;">
+      <defs>
+        <linearGradient id="flamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#ff4400" stop-opacity="0.9"/>
+          <stop offset="40%" stop-color="#ff8c00" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#ffcc33" stop-opacity="0.2"/>
+        </linearGradient>
+        <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#1e2a3a"/>
+          <stop offset="100%" stop-color="#141c28"/>
+        </linearGradient>
+        <linearGradient id="airGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#3d9be9" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#3d9be9" stop-opacity="0"/>
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="softGlow">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <clipPath id="chamberClip">
+          <ellipse cx="450" cy="170" rx="340" ry="110"/>
+        </clipPath>
+      </defs>
+
+      <!-- Background -->
+      <rect width="900" height="340" fill="#0d1520"/>
+      <!-- Subtle grid -->
+      <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M40 0L0 0 0 40" fill="none" stroke="#1a2535" stroke-width="0.5"/>
+      </pattern>
+      <rect width="900" height="340" fill="url(#g)"/>
+
+      <!-- Main combustor body outline -->
+      <ellipse cx="450" cy="170" rx="340" ry="108" fill="url(#bodyGrad)" stroke="#2a3a55" stroke-width="1.5"/>
+      <!-- Inner liner -->
+      <ellipse cx="450" cy="170" rx="290" ry="80" fill="#0d1520" stroke="#1e3050" stroke-width="1" stroke-dasharray="6,3"/>
+
+      <!-- DIFFUSER left side -->
+      <path d="M110 130 L115 105 L155 125 L155 215 L115 235 L110 210 Z" fill="#1a2a40" stroke="#2a4060" stroke-width="1.5"/>
+      <text x="132" y="175" fill="#4a7aaa" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle" font-weight="600">DIFFUSORE</text>
+
+      <!-- TURBINE right side -->
+      <path d="M785 120 L800 125 L800 215 L785 220 L780 200 L790 170 L780 140 Z" fill="#1a2a40" stroke="#2a4060" stroke-width="1.5"/>
+      <!-- Turbine blades -->
+      <g stroke="#3a5a80" stroke-width="1" fill="#243550">
+        <ellipse cx="793" cy="148" rx="5" ry="9" transform="rotate(-10,793,148)"/>
+        <ellipse cx="793" cy="170" rx="5" ry="9"/>
+        <ellipse cx="793" cy="192" rx="5" ry="9" transform="rotate(10,793,192)"/>
+      </g>
+      <text x="793" y="245" fill="#4a7aaa" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle" font-weight="600">TURBINA</text>
+
+      <!-- Air flow arrows (blue) coming in from left -->
+      <g opacity="0.7">
+        <path d="M60 145 L150 145" stroke="#3d9be9" stroke-width="1.5" fill="none" marker-end="url(#arrBlue)"/>
+        <path d="M60 170 L150 170" stroke="#3d9be9" stroke-width="2" fill="none" marker-end="url(#arrBlue)"/>
+        <path d="M60 195 L150 195" stroke="#3d9be9" stroke-width="1.5" fill="none" marker-end="url(#arrBlue)"/>
+        <text x="45" y="174" fill="#3d9be9" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle" font-weight="600">ARIA</text>
+      </g>
+      <defs>
+        <marker id="arrBlue" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#3d9be9"/>
+        </marker>
+        <marker id="arrOrange" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#ff8c00"/>
+        </marker>
+      </defs>
+
+      <!-- SWIRLER symbol -->
+      <g transform="translate(178,170)">
+        <circle r="22" fill="#0d1520" stroke="#3d9be9" stroke-width="1.5"/>
+        <path d="M0,-18 C8,-10 12,0 8,10 C-2,5 -12,-5 -8,-14 Z" fill="#3d9be9" opacity="0.5"/>
+        <path d="M0,18 C-8,10 -12,0 -8,-10 C2,-5 12,5 8,14 Z" fill="#3d9be9" opacity="0.5"/>
+        <text y="35" fill="#60c0ff" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle" font-weight="600">SWIRLER</text>
+      </g>
+
+      <!-- FLAME zone gradient -->
+      <ellipse cx="380" cy="170" rx="175" ry="72" fill="url(#flamGrad)" opacity="0.85" filter="url(#glow)"/>
+      <!-- Flame tongues -->
+      <g opacity="0.6">
+        <ellipse cx="350" cy="155" rx="18" ry="35" fill="#ff6600" opacity="0.7" transform="rotate(-10,350,155)"/>
+        <ellipse cx="390" cy="145" rx="14" ry="42" fill="#ff9900" opacity="0.6" transform="rotate(5,390,145)"/>
+        <ellipse cx="420" cy="160" rx="16" ry="30" fill="#ffbb00" opacity="0.5" transform="rotate(-5,420,160)"/>
+        <ellipse cx="360" cy="182" rx="12" ry="28" fill="#ff5500" opacity="0.65" transform="rotate(8,360,182)"/>
+      </g>
+
+      <!-- Fuel injector -->
+      <rect x="158" y="158" width="8" height="24" rx="2" fill="#4a8abf" stroke="#60a0d0" stroke-width="1"/>
+      <path d="M162 158 L158 148 L166 148 Z" fill="#60c0ff"/>
+      <text x="144" y="142" fill="#60c0ff" font-family="Rajdhani,sans-serif" font-size="8" font-weight="600">INIETTORE</text>
+      <text x="144" y="151" fill="#60c0ff" font-family="Rajdhani,sans-serif" font-size="8" font-weight="600">COMB.</text>
+
+      <!-- LINER holes (primary) -->
+      <g fill="none" stroke="#3a6080" stroke-width="1.5">
+        <circle cx="265" cy="100" r="6"/><circle cx="265" cy="240" r="6"/>
+        <circle cx="295" cy="95" r="5"/><circle cx="295" cy="245" r="5"/>
+      </g>
+      <text x="270" y="80" fill="#5a90b0" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle" font-weight="600">FORI PRIMARI</text>
+
+      <!-- LINER holes (secondary/dilution) -->
+      <g fill="none" stroke="#2a6055" stroke-width="1.5">
+        <circle cx="490" cy="98" r="5"/><circle cx="490" cy="242" r="5"/>
+        <circle cx="530" cy="103" r="5"/><circle cx="530" cy="237" r="5"/>
+        <circle cx="580" cy="108" r="5"/><circle cx="580" cy="232" r="5"/>
+        <circle cx="620" cy="113" r="5"/><circle cx="620" cy="227" r="5"/>
+      </g>
+      <text x="555" y="80" fill="#40b090" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle" font-weight="600">FORI DI DILUIZIONE</text>
+
+      <!-- ZONE LABELS with backgrounds -->
+      <!-- Zone Primaria -->
+      <rect x="220" y="290" width="130" height="36" rx="8" fill="#1a1a10" stroke="rgba(255,100,50,0.5)" stroke-width="1"/>
+      <text x="285" y="304" fill="#ff7a50" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle" font-weight="700">ZONA PRIMARIA</text>
+      <text x="285" y="316" fill="#a08060" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">φ = 0.8–1.0 · 2200–2400K</text>
+      <line x1="285" y1="252" x2="285" y2="290" stroke="rgba(255,100,50,0.4)" stroke-width="1" stroke-dasharray="4,3"/>
+
+      <!-- Zone Intermedia -->
+      <rect x="440" y="290" width="130" height="36" rx="8" fill="#1a1500" stroke="rgba(255,180,50,0.5)" stroke-width="1"/>
+      <text x="505" y="304" fill="#ffb830" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle" font-weight="700">ZONA INTERMEDIA</text>
+      <text x="505" y="316" fill="#a09050" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">φ = 0.5–0.8 · ~1800K</text>
+      <line x1="505" y1="252" x2="505" y2="290" stroke="rgba(255,180,50,0.4)" stroke-width="1" stroke-dasharray="4,3"/>
+
+      <!-- Zone Diluizione -->
+      <rect x="640" y="290" width="130" height="36" rx="8" fill="#001520" stroke="rgba(61,155,233,0.5)" stroke-width="1"/>
+      <text x="705" y="304" fill="#60c0ff" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle" font-weight="700">ZONA DILUIZIONE</text>
+      <text x="705" y="316" fill="#406080" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">φ = 2.5–3.5 · &lt;1600K uscita</text>
+      <line x1="705" y1="252" x2="705" y2="290" stroke="rgba(61,155,233,0.4)" stroke-width="1" stroke-dasharray="4,3"/>
+
+      <!-- Hot gas exit arrows -->
+      <g opacity="0.8">
+        <path d="M790 150 L850 150" stroke="#ff8c00" stroke-width="1.5" fill="none" marker-end="url(#arrOrange)"/>
+        <path d="M790 170 L860 170" stroke="#ffaa30" stroke-width="2" fill="none" marker-end="url(#arrOrange)"/>
+        <path d="M790 190 L850 190" stroke="#ff8c00" stroke-width="1.5" fill="none" marker-end="url(#arrOrange)"/>
+        <text x="875" y="174" fill="#ff9020" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle" font-weight="600">GAS</text>
+        <text x="875" y="184" fill="#ff9020" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle" font-weight="600">CALDI</text>
+      </g>
+
+      <!-- Fuel spray drops -->
+      <g fill="#60c0ff" opacity="0.6">
+        <circle cx="208" cy="165" r="2.5"/>
+        <circle cx="218" cy="172" r="2"/>
+        <circle cx="226" cy="163" r="1.8"/>
+        <circle cx="215" cy="180" r="2"/>
+        <circle cx="230" cy="175" r="1.5"/>
+      </g>
+
+      <!-- Pressure loss formula top right -->
+      <text x="870" y="30" fill="#3a6080" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="end">Δp/p₀ ∝ v²</text>
+
+      <!-- Title top left -->
+      <text x="30" y="30" fill="#5a7a9a" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="2">SEZIONE LONGITUDINALE — CAMERA DI COMBUSTIONE TG</text>
+
+      <!-- CASE ESTERNO label -->
+      <text x="450" y="22" fill="#3a5a7a" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">CASE ESTERNO</text>
+      <text x="450" y="325" fill="#2d4060" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">LINER (parete forata)</text>
+    </svg>
+  </div>
+</div>
+
+<!-- SECTION TITLE -->
+<div class="section-title">
+  <h2>Sezioni di <span>Approfondimento</span></h2>
+</div>
+
+<!-- CARDS GRID -->
+<div class="cards-grid">
+
+  <div class="card" onclick="openModal('evoluzione')">
+    <div class="card-icon">🔧</div>
+    <div class="card-tag">Storia & Design</div>
+    <h3>Evoluzione della Geometria</h3>
+    <p>Dal condotto tubolare alle configurazioni moderne con diffusore e bluff-body: perdite di carico, blowout e flashback.</p>
+    <span class="card-arrow">→</span>
+  </div>
+
+  <div class="card blue" onclick="openModal('componenti')">
+    <div class="card-icon">⚙️</div>
+    <div class="card-tag">Componenti</div>
+    <h3>Diffusore, Liner & Swirler</h3>
+    <p>Funzione tecnica di ciascun elemento: riduzione velocità, distribuzione aria, creazione del moto vorticoso.</p>
+    <span class="card-arrow">→</span>
+  </div>
+
+  <div class="card" onclick="openModal('zone')">
+    <div class="card-icon">🔥</div>
+    <div class="card-tag">Termodinamica</div>
+    <h3>Le Tre Zone Funzionali</h3>
+    <p>Zona primaria, intermedia e di diluizione: rapporti di equivalenza, temperature, portate e funzioni specifiche.</p>
+    <span class="card-arrow">→</span>
+  </div>
+
+  <div class="card teal" onclick="openModal('tipologie')">
+    <div class="card-icon">🏗️</div>
+    <div class="card-tag">Architettura</div>
+    <h3>Tipologie di Combustori</h3>
+    <p>Tubolare, multican, tubo-anulare, anulare: confronto di vantaggi strutturali, peso e applicazioni tipiche.</p>
+    <span class="card-arrow">→</span>
+  </div>
+
+  <div class="card blue" onclick="openModal('raffreddamento')">
+    <div class="card-icon">❄️</div>
+    <div class="card-tag">Tecnologie Termiche</div>
+    <h3>Raffreddamento del Liner</h3>
+    <p>Film cooling, convection-film, impingement e traspirazione: tecniche per proteggere le pareti dai gas ad alta temperatura.</p>
+    <span class="card-arrow">→</span>
+  </div>
+
+  <div class="card" onclick="openModal('combustibili')">
+    <div class="card-icon">⛽</div>
+    <div class="card-tag">Carburanti & Impianto</div>
+    <h3>Combustibili & Impianto</h3>
+    <p>Jet A-1, Avgas, SAF; potere calorifico, rapporto stechiometrico, serbatoi e pompe di alimentazione aeronautici.</p>
+    <span class="card-arrow">→</span>
+  </div>
+
+</div>
+
+<!-- ===== MATURITÀ DIVIDER ===== -->
+<div class="maturita-section">
+  <div class="maturita-badge">
+    <div class="maturita-badge-line"></div>
+    <div class="maturita-badge-text">🎓 &nbsp;Esame di Maturità — Collegamenti Interdisciplinari</div>
+    <div class="maturita-badge-line"></div>
+  </div>
+  <p class="maturita-sub">Il tema dei sistemi propulsivi e della combustione si intreccia con la letteratura italiana del Novecento e con il linguaggio tecnico inglese aeronautico</p>
+</div>
+
+<!-- ===== MATURITÀ CARDS ===== -->
+<div class="cards-grid">
+
+  <div class="card italiano" onclick="openModal('italiano')">
+    <div class="card-icon" style="background:rgba(180,80,200,0.12);border-color:rgba(180,80,200,0.3);">📖</div>
+    <div class="card-tag" style="color:#c060e0;">Italiano — Letteratura</div>
+    <h3>Pirandello e il Progresso Tecnologico</h3>
+    <p>La crisi dell'identità nell'uomo moderno di fronte alla rivoluzione industriale e all'avvento dell'aviazione. Vita, pensiero, opere e collegamento con il contesto aeronautico.</p>
+    <span class="card-arrow">→</span>
+  </div>
+
+  <div class="card inglese" onclick="openModal('inglese')">
+    <div class="card-icon" style="background:rgba(40,180,100,0.12);border-color:rgba(40,180,100,0.3);">🇬🇧</div>
+    <div class="card-tag" style="color:#40c880;">English — Technical Language</div>
+    <h3>Aircraft Fuel Systems in English</h3>
+    <p>Vocabulary, reading comprehension and key concepts on aviation fuel: types, storage, distribution, non-routine events and fuel planning under EASA regulations.</p>
+    <span class="card-arrow">→</span>
+  </div>
+
+</div>
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modalContent">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<footer>
+  <p>Meccanica Macchine e Sistemi Propulsivi &nbsp;·&nbsp; Camera di Combustione Turbine a Gas &nbsp;·&nbsp; Materiale didattico</p>
+</footer>
+
+<script>
+// ======= MODAL DATA =======
+const modals = {
+
+evoluzione: `
+<div class="modal-header-tag">Storia & Design</div>
+<h2>Evoluzione della Geometria del Combustore</h2>
+<div class="modal-divider"></div>
+<div class="modal-body">
+
+<p>La camera di combustione delle turbine a gas ha subito una profonda evoluzione progettuale, guidata dalla necessità di ridurre le perdite di carico, ancorare stabilmente la fiamma e contenere le emissioni inquinanti.</p>
+
+<h3>Problema della Configurazione Tubolare Iniziale</h3>
+<p>Nella configurazione originale a sezione costante, l'aria proveniente dal compressore entrava con velocità tipica di circa <strong class="hi-blue">150 m/s</strong>. Questo causava:</p>
+<ul>
+  <li>Elevate perdite di carico per attrito (proporzionali a v²)</li>
+  <li>Velocità troppo elevata per ancorare la fiamma</li>
+  <li>Rapporti aria/combustibile (AFR) fuori dai limiti di infiammabilità</li>
+</ul>
+
+<div class="formula-box">
+  <div class="formula-label">Perdita di Carico Adimensionale</div>
+  <div class="formula-main">
+    Δp* = (p<sub>0,IN</sub> − p<sub>0,OUT</sub>) / p<sub>0,IN</sub> &nbsp;∝&nbsp; v²
+  </div>
+  <div class="formula-note">
+    Con v ≈ 150 m/s a sezione costante, la perdita può raggiungere ~10% del salto di pressione del compressore — inaccettabile.
+  </div>
+</div>
+
+<h3>Stadi Evolutivi della Geometria</h3>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 780 230" xmlns="http://www.w3.org/2000/svg" width="100%" style="display:block; padding:16px;">
+  <rect width="780" height="230" fill="transparent"/>
+  <!-- (a) Tubolare puro -->
+  <text x="90" y="20" fill="#6a8aaa" font-family="Rajdhani,sans-serif" font-size="11" text-anchor="middle" font-weight="700">(a) Tubolare</text>
+  <rect x="10" y="30" width="160" height="60" rx="4" fill="#1a2535" stroke="#2a4060" stroke-width="1.5"/>
+  <rect x="10" y="30" width="160" height="60" rx="4" fill="none" stroke="#ff4444" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="50" y1="60" x2="160" y2="60" stroke="#3d9be9" stroke-width="1.5" marker-end="url(#a2)"/>
+  <text x="95" y="115" fill="#ff5555" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Blowout! (v troppo alta)</text>
+  <text x="95" y="126" fill="#ff5555" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">AFR fuori range</text>
+
+  <!-- (b) Con diffusore -->
+  <text x="285" y="20" fill="#6a8aaa" font-family="Rajdhani,sans-serif" font-size="11" text-anchor="middle" font-weight="700">(b) Diffusore + conv.</text>
+  <path d="M205 35 L230 45 L300 45 L330 35 L330 85 L300 75 L230 75 L205 85 Z" fill="#1a2535" stroke="#2a4060" stroke-width="1.5"/>
+  <path d="M305 52 L345 60 L305 68" fill="none" stroke="#3d9be9" stroke-width="1.5"/>
+  <text x="285" y="115" fill="#ffaa30" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Velocità ridotta, ma</text>
+  <text x="285" y="126" fill="#ffaa30" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">ancora no ancoraggio</text>
+
+  <!-- (c) Con bluff-body -->
+  <text x="480" y="20" fill="#6a8aaa" font-family="Rajdhani,sans-serif" font-size="11" text-anchor="middle" font-weight="700">(c) + Bluff-Body</text>
+  <path d="M400 35 L425 45 L500 45 L530 35 L530 85 L500 75 L425 75 L400 85 Z" fill="#1a2535" stroke="#2a4060" stroke-width="1.5"/>
+  <rect x="420" y="48" width="12" height="24" rx="2" fill="#3d9be9" stroke="#60c0ff" stroke-width="1"/>
+  <!-- Recirculation arrows -->
+  <path d="M435 55 C450 45 465 45 470 55 C465 65 450 65 435 55" fill="none" stroke="#ff8c00" stroke-width="1.5" marker-end="url(#a3)"/>
+  <text x="480" y="115" fill="#40d090" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Zona ricircolazione!</text>
+  <text x="480" y="126" fill="#40d090" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Fiamma ancorata</text>
+
+  <!-- (d) Con Liner completo -->
+  <text x="680" y="20" fill="#6a8aaa" font-family="Rajdhani,sans-serif" font-size="11" text-anchor="middle" font-weight="700">(d) + Liner</text>
+  <path d="M600 25 L625 35 L720 35 L750 25 L750 95 L720 85 L625 85 L600 95 Z" fill="#1a2535" stroke="#2a4060" stroke-width="1.5"/>
+  <rect x="615" y="38" width="8" height="47" rx="2" fill="none" stroke="#1e3a5a" stroke-width="1" stroke-dasharray="3,2"/>
+  <rect x="620" y="43" width="120" height="34" rx="3" fill="#0d1520" stroke="#1a3050" stroke-width="1"/>
+  <!-- holes -->
+  <circle cx="660" cy="43" r="3" fill="none" stroke="#40a080" stroke-width="1.5"/>
+  <circle cx="690" cy="43" r="3" fill="none" stroke="#40a080" stroke-width="1.5"/>
+  <circle cx="720" cy="43" r="3" fill="none" stroke="#40a080" stroke-width="1.5"/>
+  <circle cx="660" cy="77" r="3" fill="none" stroke="#40a080" stroke-width="1.5"/>
+  <circle cx="690" cy="77" r="3" fill="none" stroke="#40a080" stroke-width="1.5"/>
+  <circle cx="720" cy="77" r="3" fill="none" stroke="#40a080" stroke-width="1.5"/>
+  <ellipse cx="645" cy="60" rx="15" ry="10" fill="#ff6600" opacity="0.5" filter="url(#sglow)"/>
+  <text x="680" y="115" fill="#40d090" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Distribuzione ottimale</text>
+  <text x="680" y="126" fill="#40d090" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Zone differenziate</text>
+
+  <defs>
+    <marker id="a2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#3d9be9"/></marker>
+    <marker id="a3" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#ff8c00"/></marker>
+    <filter id="sglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+</svg>
+</div>
+
+<h3>Blowout e Flashback</h3>
+<p>Il design del combustore deve prevenire due fenomeni opposti:</p>
+<ul>
+  <li><strong class="hi">Blowout</strong>: la corrente d'aria è troppo veloce → la fiamma viene spazzata via dalla zona di iniezione e si spegne.</li>
+  <li><strong class="hi">Flashback</strong>: la velocità è troppo bassa → la fiamma risale a monte della zona di combustione, danneggiando componenti non progettati per il contatto diretto con la fiamma.</li>
+</ul>
+
+<div class="example-box">
+  <div class="ex-label">Esempio pratico — Motore CFM56</div>
+  <p>Nel CFM56, ampiamente utilizzato su Boeing 737 e Airbus A320, la velocità all'ingresso del liner è ridotta a circa 25–30 m/s tramite diffusore, rispetto ai 150 m/s in uscita dal compressore. Il rapporto di area diffusore supera 5:1. Questo riduce le perdite di carico al di sotto del 3–5% della pressione totale.</p>
+</div>
+
+</div>
+`,
+
+componenti: `
+<div class="modal-header-tag">Componenti</div>
+<h2>Diffusore, Liner & Swirler</h2>
+<div class="modal-divider"></div>
+<div class="modal-body">
+
+<h3>Il Diffusore</h3>
+<p>Il diffusore è il componente che riceve l'aria compressa dal compressore (a ~150 m/s) e la rallenta per ridurre le perdite di pressione nella camera. Esistono due configurazioni principali:</p>
+<ul>
+  <li><strong>Faired diffuser</strong>: condotto lungo, ottimizzato per minime perdite di pressione dinamica, ma più ingombrante.</li>
+  <li><strong>Dump diffuser</strong> (annular dump): condotto corto con espansione improvvisa a valle del compressore; più compatto, ma con perdite di carico maggiori. Rende il flusso meno sensibile alle variazioni di velocità in uscita dal compressore.</li>
+</ul>
+
+<div class="formula-box">
+  <div class="formula-label">Perdite nel Diffusore — Dipendenza</div>
+  <div class="formula-main">
+    Δp<sub>diff</sub> = f(Ma<sub>in</sub>, A<sub>out</sub>/A<sub>in</sub>, L/h)
+  </div>
+  <div class="formula-note">
+    Le perdite dipendono dalle condizioni di moto all'ingresso (numero di Mach), dal rapporto di aree (ingresso/uscita) e dal rapporto lunghezza/altezza del diffusore. Angolo di divergenza ottimale: 7°–10°.
+  </div>
+</div>
+
+<h3>Il Liner (Parete Forata)</h3>
+<p>Il liner è la parete forata che divide fisicamente il combustore in:</p>
+<ul>
+  <li>Una <strong class="hi">zona centrale (core)</strong> dove avviene la combustione</li>
+  <li>Uno o più <strong class="hi">condotti laterali</strong> dove scorre l'aria in eccesso</li>
+</ul>
+<p>Tramite fori primari, secondari e di diluizione, l'aria dei condotti si reimmette nel core in quantità calibrate per ciascuna zona. <strong>Oltre il 50% dell'aria totale</strong> è dedicata al raffreddamento del liner stesso.</p>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" width="100%" style="display:block; padding:12px;">
+  <rect width="720" height="200" fill="transparent"/>
+  <!-- Outer casing -->
+  <rect x="40" y="30" width="640" height="140" rx="8" fill="#141c28" stroke="#2a3a55" stroke-width="1.5"/>
+  <!-- Inner liner -->
+  <rect x="60" y="60" width="580" height="80" rx="5" fill="#0d1520" stroke="#1e4060" stroke-width="1.5" stroke-dasharray="8,4"/>
+  <!-- Air passages outer top -->
+  <rect x="60" y="30" width="580" height="30" rx="0" fill="#0f1828" opacity="0.8"/>
+  <!-- Air passages outer bottom -->
+  <rect x="60" y="140" width="580" height="30" rx="0" fill="#0f1828" opacity="0.8"/>
+  <!-- Swirler -->
+  <circle cx="80" cy="100" r="20" fill="#0d1520" stroke="#3d9be9" stroke-width="1.5"/>
+  <path d="M80,80 C88,86 92,100 86,112 C75,107 70,95 76,83 Z" fill="#3d9be9" opacity="0.5"/>
+  <path d="M80,120 C72,114 68,100 74,88 C85,93 90,105 84,117 Z" fill="#3d9be9" opacity="0.5"/>
+  <text x="80" y="153" fill="#60c0ff" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle" font-weight="600">SWIRLER</text>
+  <!-- Flame core -->
+  <ellipse cx="280" cy="100" rx="140" ry="28" fill="#ff6600" opacity="0.35"/>
+  <ellipse cx="240" cy="100" rx="80" ry="22" fill="#ff8c00" opacity="0.4"/>
+  <!-- Primary holes -->
+  <g fill="none" stroke="#3d9be9" stroke-width="2">
+    <circle cx="175" cy="60" r="5"/><circle cx="175" cy="140" r="5"/>
+    <circle cx="210" cy="60" r="4"/><circle cx="210" cy="140" r="4"/>
+  </g>
+  <path d="M175 55 L175 70" stroke="#3d9be9" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <path d="M175 130 L175 145" stroke="#3d9be9" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="192" y="20" fill="#5090b0" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle" font-weight="600">FORI PRIMARI</text>
+  <!-- Secondary holes -->
+  <g fill="none" stroke="#ffaa30" stroke-width="2">
+    <circle cx="360" cy="60" r="4"/><circle cx="360" cy="140" r="4"/>
+    <circle cx="395" cy="60" r="4"/><circle cx="395" cy="140" r="4"/>
+  </g>
+  <text x="377" y="20" fill="#aa7020" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle" font-weight="600">FORI SECONDARI</text>
+  <!-- Dilution holes -->
+  <g fill="none" stroke="#40c080" stroke-width="2">
+    <circle cx="500" cy="60" r="5"/><circle cx="500" cy="140" r="5"/>
+    <circle cx="540" cy="60" r="5"/><circle cx="540" cy="140" r="5"/>
+    <circle cx="580" cy="60" r="5"/><circle cx="580" cy="140" r="5"/>
+  </g>
+  <text x="540" y="20" fill="#2a8060" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle" font-weight="600">FORI DILUIZIONE</text>
+  <!-- Exit -->
+  <rect x="640" y="60" width="30" height="80" rx="4" fill="#1a2535" stroke="#2a4060" stroke-width="1"/>
+  <text x="655" y="180" fill="#4a7aaa" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">USCITA</text>
+  <!-- Zone labels -->
+  <text x="215" y="107" fill="#ff7a50" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle" font-weight="700">PRIMARIA</text>
+  <text x="380" y="107" fill="#ffb830" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle" font-weight="700">SECONDARIA</text>
+  <text x="545" y="107" fill="#40c090" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle" font-weight="700">DILUIZIONE</text>
+</svg>
+</div>
+
+<h3>Lo Swirler</h3>
+<p>Lo swirler è un corpo non-aerodinamico (bluff-body) posizionato a monte dell'iniettore del combustibile. La sua funzione è generare un <strong class="hi">moto vorticoso (swirl)</strong> nel flusso d'aria per:</p>
+<ul>
+  <li>Creare una zona di ricircolazione a bassa velocità per ancorare la fiamma</li>
+  <li>Aumentare il mescolamento tra aria e combustibile</li>
+  <li>Stabilizzare la combustione in un ampio range di condizioni operative</li>
+</ul>
+
+<div class="data-grid">
+  <div class="data-cell"><span class="val">Assiali</span><span class="lbl">Flusso nella direzione dell'asse</span></div>
+  <div class="data-cell"><span class="val">Radiali</span><span class="lbl">Flusso in direzione radiale</span></div>
+  <div class="data-cell"><span class="val">Singoli</span><span class="lbl">Una schiera di pale</span></div>
+  <div class="data-cell"><span class="val">Doppi</span><span class="lbl">Due schiere controrotanti</span></div>
+</div>
+
+<div class="example-box">
+  <div class="ex-label">Esempio applicativo — Swirler Doppio</div>
+  <p>Nelle turbine aeronautiche moderne (es. GE90, Trent 900), si usa tipicamente uno swirler doppio contro-rotante. La zona centrale mostra un inversione del profilo di velocità assiale (ricircolo), mentre all'uscita il flusso ha componenti sia tangenziali che assiali. Il numero di swirl S > 0.6 è sufficiente per generare ricircolo con vortex breakdown.</p>
+</div>
+
+</div>
+`,
+
+zone: `
+<div class="modal-header-tag">Termodinamica</div>
+<h2>Le Tre Zone Funzionali</h2>
+<div class="modal-divider"></div>
+<div class="modal-body">
+
+<p>Il liner suddivide il processo di combustione in tre zone con funzioni termodinamiche ben distinte, ciascuna caratterizzata da un preciso rapporto di equivalenza φ (rapporto aria effettiva/aria stechiometrica invertito: φ = FAR<sub>reale</sub>/FAR<sub>stoich</sub>).</p>
+
+<div class="formula-box">
+  <div class="formula-label">Rapporto di Equivalenza</div>
+  <div class="formula-main">φ = (m<sub>fuel</sub>/m<sub>air</sub>)<sub>reale</sub> / (m<sub>fuel</sub>/m<sub>air</sub>)<sub>stechio</sub></div>
+  <div class="formula-note">
+    φ = 1 → miscela stechiometrica · φ &lt; 1 → miscela magra · φ &gt; 1 → miscela ricca<br>
+    Il rapporto globale di eccesso d'aria nella TG è φ<sub>glob</sub> = 2.5–3.5
+  </div>
+</div>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 720 180" xmlns="http://www.w3.org/2000/svg" width="100%" style="display:block; padding:12px;">
+  <rect width="720" height="180" fill="transparent"/>
+  <!-- Zone backgrounds -->
+  <rect x="20" y="30" width="200" height="100" rx="8" fill="rgba(255,100,50,0.08)" stroke="rgba(255,100,50,0.3)" stroke-width="1.5"/>
+  <rect x="240" y="30" width="200" height="100" rx="8" fill="rgba(255,180,50,0.07)" stroke="rgba(255,180,50,0.3)" stroke-width="1.5"/>
+  <rect x="460" y="30" width="240" height="100" rx="8" fill="rgba(61,155,233,0.07)" stroke="rgba(61,155,233,0.3)" stroke-width="1.5"/>
+
+  <!-- Zone Primaria -->
+  <text x="120" y="52" fill="#ff7a50" font-family="Rajdhani,sans-serif" font-size="12" text-anchor="middle" font-weight="700">ZONA PRIMARIA</text>
+  <text x="120" y="68" fill="#a06050" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">φ = 0.8 – 1.0</text>
+  <text x="120" y="82" fill="#a06050" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">T = 2200–2400 K</text>
+  <text x="120" y="96" fill="#a06050" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">ṁ ≈ 60% ṁ<tspan dy="-2" font-size="7">tot</tspan></text>
+  <ellipse cx="90" cy="118" rx="22" ry="16" fill="#ff6600" opacity="0.5"/>
+  <ellipse cx="80" cy="110" rx="14" ry="20" fill="#ff4400" opacity="0.4"/>
+  <text x="120" y="140" fill="#ff9070" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Accensione + combustione iniziale</text>
+
+  <!-- Zone Intermedia -->
+  <text x="340" y="52" fill="#ffb830" font-family="Rajdhani,sans-serif" font-size="12" text-anchor="middle" font-weight="700">ZONA INTERMEDIA</text>
+  <text x="340" y="68" fill="#a09050" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">φ = 0.5 – 0.8</text>
+  <text x="340" y="82" fill="#a09050" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">T ≈ 1800 K</text>
+  <text x="340" y="96" fill="#a09050" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">L ≈ 0.5–1.5 D<tspan dy="-2" font-size="7">liner</tspan></text>
+  <text x="340" y="140" fill="#c09030" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Ossidazione CO → CO₂</text>
+
+  <!-- Zone Diluizione -->
+  <text x="580" y="52" fill="#60c0ff" font-family="Rajdhani,sans-serif" font-size="12" text-anchor="middle" font-weight="700">ZONA DILUIZIONE</text>
+  <text x="580" y="68" fill="#406090" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">φ<tspan dy="-2" font-size="7">glob</tspan> = 2.5 – 3.5</text>
+  <text x="580" y="82" fill="#406090" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">T<tspan dy="-2" font-size="7">uscita</tspan> &lt; 1600 K</text>
+  <text x="580" y="96" fill="#406090" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">ṁ<tspan dy="-2" font-size="7">dil</tspan> = 20–40% ṁ<tspan dy="-2" font-size="7">tot</tspan></text>
+  <text x="580" y="140" fill="#4090c0" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Raffreddamento → protezione turbina</text>
+
+  <!-- Arrows separating zones -->
+  <path d="M220 80 L238 80" stroke="#5a7090" stroke-width="1.5" marker-end="url(#av)"/>
+  <path d="M440 80 L458 80" stroke="#5a7090" stroke-width="1.5" marker-end="url(#av)"/>
+  <defs><marker id="av" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5a7090"/></marker></defs>
+</svg>
+</div>
+
+<h3>Zona Primaria — Dettaglio</h3>
+<p>La zona primaria ha il compito di avviare la fiamma e garantire la combustione iniziale con miscele vicine alla stechiometria. La portata di aria primaria è circa il <strong class="hi">60% della portata totale</strong> che partecipa alla combustione.</p>
+<ul>
+  <li>Lunghezza: L<sub>PZ</sub> ≈ (0.66 – 0.75) D<sub>liner</sub></li>
+  <li>Temperatura: T<sub>PZ</sub> ≈ 2200 – 2400 K</li>
+  <li>Due sottotipologie: ricircolo ad ampia scala (pochi getti grandi) o piccola scala (molti getti piccoli)</li>
+</ul>
+
+<h3>Zona Intermedia — Dettaglio</h3>
+<p>Se i gas caldi passassero direttamente alla zona di diluizione, le specie intermedie come il <strong class="hi">monossido di carbonio (CO)</strong> si "congelerebbero" senza ossidarsi completamente, aumentando le emissioni inquinanti. La zona intermedia garantisce il completamento della combustione.</p>
+<ul>
+  <li>Per motori aeronautici la lunghezza è maggiore (alta quota → pressione minore → combustione più lenta)</li>
+</ul>
+
+<h3>Zona di Diluizione — Dettaglio</h3>
+<p>La funzione principale è abbassare e uniformare la temperatura all'uscita del combustore entro i limiti ammessi per le palette della turbina (~1300–1400°C). Il rapporto L/D (lunghezza/diametro dei getti d'aria) è compreso tra 1.5 e 1.8.</p>
+
+<div class="data-grid">
+  <div class="data-cell"><span class="val">2200–2400 K</span><span class="lbl">T zona primaria</span></div>
+  <div class="data-cell"><span class="val">~1800 K</span><span class="lbl">T zona intermedia</span></div>
+  <div class="data-cell"><span class="val">&lt;1600 K</span><span class="lbl">T uscita combustore</span></div>
+  <div class="data-cell"><span class="val">1300–1400°C</span><span class="lbl">Limite materiali turbina</span></div>
+</div>
+
+<div class="example-box">
+  <div class="ex-label">Esempio pratico — Turbina industriale a gas</div>
+  <p>In una turbina industriale (es. GE Frame 9E), il rapporto di eccesso d'aria globale φ ≈ 3.0 è necessario per portare la TIT (Turbine Inlet Temperature) da valori teorici di fiamma ~2200 K al limite ammissibile ~1570 K (1300°C). L'aria di diluizione rappresenta circa il 35% dell'aria totale e garantisce un OTDF (Overall Temperature Distribution Factor) inferiore al 15% per preservare le pale della prima schiera statorica.</p>
+</div>
+
+</div>
+`,
+
+tipologie: `
+<div class="modal-header-tag">Architettura</div>
+<h2>Tipologie di Combustori</h2>
+<div class="modal-divider"></div>
+<div class="modal-body">
+
+<p>I combustori delle turbine a gas sono classificati in quattro tipologie principali in base alla geometria, con caratteristiche molto diverse in termini di peso, perdite di carico e applicazioni.</p>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" width="100%" style="display:block; padding:16px;">
+  <rect width="720" height="240" fill="transparent"/>
+
+  <!-- TUBOLARE -->
+  <text x="90" y="20" fill="#6a8aaa" font-family="Rajdhani,sans-serif" font-size="11" text-anchor="middle" font-weight="700">TUBOLARE</text>
+  <rect x="15" y="28" width="150" height="65" rx="8" fill="#1a2535" stroke="#2a4060" stroke-width="1.5"/>
+  <rect x="30" y="40" width="110" height="40" rx="5" fill="#0d1520" stroke="#1a3050" stroke-width="1"/>
+  <circle cx="40" cy="60" r="8" fill="none" stroke="#3d9be9" stroke-width="1.5"/>
+  <ellipse cx="100" cy="60" rx="18" ry="12" fill="#ff5500" opacity="0.4"/>
+  <text x="90" y="110" fill="#ff7a50" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Robusto · Ingombrante</text>
+  <text x="90" y="122" fill="#a06050" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Industriale single-can</text>
+
+  <!-- MULTICAN -->
+  <text x="270" y="20" fill="#6a8aaa" font-family="Rajdhani,sans-serif" font-size="11" text-anchor="middle" font-weight="700">MULTI-CAN</text>
+  <rect x="185" y="28" width="170" height="90" rx="8" fill="#1a2535" stroke="#2a4060" stroke-width="1.5"/>
+  <!-- Multiple tubes in circular arrangement -->
+  <g transform="translate(270,73)">
+    <rect x="-60" y="-16" width="30" height="32" rx="4" fill="#0d1520" stroke="#1a3050" stroke-width="1"/>
+    <rect x="-15" y="-16" width="30" height="32" rx="4" fill="#0d1520" stroke="#1a3050" stroke-width="1"/>
+    <rect x="30" y="-16" width="30" height="32" rx="4" fill="#0d1520" stroke="#1a3050" stroke-width="1"/>
+    <circle cx="-45" cy="0" r="4" fill="#ff5500" opacity="0.5"/>
+    <circle cx="0" cy="0" r="4" fill="#ff5500" opacity="0.5"/>
+    <circle cx="45" cy="0" r="4" fill="#ff5500" opacity="0.5"/>
+  </g>
+  <text x="270" y="133" fill="#ffb830" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Test su singolo can</text>
+  <text x="270" y="145" fill="#a09050" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Aeronautico storico</text>
+
+  <!-- TUBO-ANULARE -->
+  <text x="470" y="20" fill="#6a8aaa" font-family="Rajdhani,sans-serif" font-size="11" text-anchor="middle" font-weight="700">TUBO-ANULARE</text>
+  <g transform="translate(470,73)">
+    <ellipse cx="0" cy="0" rx="60" ry="55" fill="#1a2535" stroke="#2a4060" stroke-width="1.5"/>
+    <ellipse cx="0" cy="0" rx="36" ry="32" fill="#0d1520" stroke="#1a3050" stroke-width="1"/>
+    <!-- Tubes at positions -->
+    <g transform="rotate(0)"><rect x="-6" y="-52" width="12" height="18" rx="3" fill="#1a2a3a" stroke="#2a4060" stroke-width="1"/></g>
+    <g transform="rotate(51.4)"><rect x="-6" y="-52" width="12" height="18" rx="3" fill="#1a2a3a" stroke="#2a4060" stroke-width="1"/></g>
+    <g transform="rotate(102.8)"><rect x="-6" y="-52" width="12" height="18" rx="3" fill="#1a2a3a" stroke="#2a4060" stroke-width="1"/></g>
+    <g transform="rotate(154.2)"><rect x="-6" y="-52" width="12" height="18" rx="3" fill="#1a2a3a" stroke="#2a4060" stroke-width="1"/></g>
+    <g transform="rotate(205.6)"><rect x="-6" y="-52" width="12" height="18" rx="3" fill="#1a2a3a" stroke="#2a4060" stroke-width="1"/></g>
+    <g transform="rotate(257)"><rect x="-6" y="-52" width="12" height="18" rx="3" fill="#1a2a3a" stroke="#2a4060" stroke-width="1"/></g>
+    <g transform="rotate(308.4)"><rect x="-6" y="-52" width="12" height="18" rx="3" fill="#1a2a3a" stroke="#2a4060" stroke-width="1"/></g>
+  </g>
+  <text x="470" y="148" fill="#40d090" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Perdite basse · Robusto</text>
+  <text x="470" y="160" fill="#30a070" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Compromise solution</text>
+
+  <!-- ANULARE -->
+  <text x="640" y="20" fill="#6a8aaa" font-family="Rajdhani,sans-serif" font-size="11" text-anchor="middle" font-weight="700">ANULARE</text>
+  <g transform="translate(640,73)">
+    <ellipse cx="0" cy="0" rx="58" ry="52" fill="#1a2535" stroke="#2a4060" stroke-width="1.5"/>
+    <ellipse cx="0" cy="0" rx="36" ry="32" fill="#0d1520" stroke="#1a3050" stroke-width="1"/>
+    <ellipse cx="0" cy="0" rx="47" ry="42" fill="none" stroke="#ff6600" stroke-width="2" stroke-dasharray="3,3" opacity="0.6"/>
+    <!-- Injection points -->
+    <circle cx="0" cy="-42" r="3" fill="#3d9be9" opacity="0.8"/>
+    <circle cx="29.7" cy="-30.0" r="3" fill="#3d9be9" opacity="0.8"/>
+    <circle cx="42" cy="0" r="3" fill="#3d9be9" opacity="0.8"/>
+    <circle cx="29.7" cy="30" r="3" fill="#3d9be9" opacity="0.8"/>
+    <circle cx="0" cy="42" r="3" fill="#3d9be9" opacity="0.8"/>
+    <circle cx="-29.7" cy="30" r="3" fill="#3d9be9" opacity="0.8"/>
+    <circle cx="-42" cy="0" r="3" fill="#3d9be9" opacity="0.8"/>
+    <circle cx="-29.7" cy="-30" r="3" fill="#3d9be9" opacity="0.8"/>
+  </g>
+  <text x="640" y="148" fill="#60c0ff" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Leggero · Compatto</text>
+  <text x="640" y="160" fill="#4090c0" font-family="Rajdhani,sans-serif" font-size="9" text-anchor="middle">Standard moderno aero</text>
+
+  <!-- Legend -->
+  <circle cx="20" cy="205" r="5" fill="#3d9be9" opacity="0.8"/>
+  <text x="30" y="209" fill="#5090b0" font-family="Rajdhani,sans-serif" font-size="9">Iniettori combustibile</text>
+  <rect x="170" y="200" width="12" height="8" rx="2" fill="#1a2a3a" stroke="#2a4060" stroke-width="1"/>
+  <text x="188" y="209" fill="#5090b0" font-family="Rajdhani,sans-serif" font-size="9">Liner tubolare</text>
+  <line x1="320" y1="204" x2="340" y2="204" stroke="#ff6600" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="346" y="209" fill="#5090b0" font-family="Rajdhani,sans-serif" font-size="9">Zona di combustione</text>
+</svg>
+</div>
+
+<h3>Confronto Vantaggi e Svantaggi</h3>
+
+<div class="data-grid" style="grid-template-columns: repeat(2,1fr);">
+  <div class="data-cell" style="text-align:left;">
+    <span class="val" style="font-size:1.1rem;">Tubolare</span>
+    <span class="lbl" style="display:block; margin-top:6px;">✅ Robusto strutturalmente<br>✅ Test su piccola frazione aria<br>❌ Ingombrante e pesante<br>❌ Elevate perdite di carico</span>
+  </div>
+  <div class="data-cell" style="text-align:left;">
+    <span class="val" style="font-size:1.1rem;">Anulare</span>
+    <span class="lbl" style="display:block; margin-top:6px;">✅ Minima lunghezza e peso<br>✅ Minima sezione frontale<br>✅ Basse perdite di carico<br>❌ Problemi strutturali/vibrazionali<br>❌ Test richiedono portata totale</span>
+  </div>
+  <div class="data-cell" style="text-align:left;">
+    <span class="val" style="font-size:1.1rem;">Tubo-Anulare</span>
+    <span class="lbl" style="display:block; margin-top:6px;">✅ Robusto + basse perdite<br>✅ Test piccola frazione aria<br>✅ Più corto del tubolare<br>❌ Meno compatto dell'anulare</span>
+  </div>
+  <div class="data-cell" style="text-align:left;">
+    <span class="val" style="font-size:1.1rem;">Multi-Can</span>
+    <span class="lbl" style="display:block; margin-top:6px;">✅ Ogni combustore indipendente<br>✅ Manutenzione semplificata<br>❌ Maggior peso rispetto anulare</span>
+  </div>
+</div>
+
+<div class="example-box">
+  <div class="ex-label">Applicazione aeronautica — Camera Anulare</div>
+  <p>I moderni turbofan di grande diametro (GE90, Rolls-Royce Trent 1000, CFM LEAP) adottano tutti la configurazione anulare, poiché l'aumento della TIT richiede riduzione dell'aria di diluizione. I combustori DLE (Dry-Low-Emission) a premiscelamento magro sfruttano la geometria anulare per una distribuzione uniforme della fiamma e il controllo delle emissioni di NOₓ.</p>
+</div>
+
+</div>
+`,
+
+raffreddamento: `
+<div class="modal-header-tag">Tecnologie Termiche</div>
+<h2>Raffreddamento del Liner</h2>
+<div class="modal-divider"></div>
+<div class="modal-body">
+
+<p>Le pareti del liner devono resistere a temperature di gas combusti che possono raggiungere 2200–2400 K nella zona primaria, ben al di sopra delle capacità termiche dei materiali strutturali (tipicamente leghe di nichel in grado di sopportare max ~1200–1300 K). Il raffreddamento è quindi un aspetto critico del progetto.</p>
+
+<p><strong class="hi-teal">Oltre il 50% dell'aria totale</strong> che entra nel combustore è impiegata per raffreddare le pareti del liner, ridistribuita tramite fori e passaggi calibrati.</p>
+
+<div class="formula-box">
+  <div class="formula-label">Distribuzione Tipica dell'Aria nel Combustore</div>
+  <div class="formula-main">
+    Zona primaria: ~20% · Swirler+iniettore: ~8% · Zona seconda: ~12%<br>
+    Raffreddamento liner: ~40% · Diluizione: ~20%
+  </div>
+  <div class="formula-note">I valori variano sensibilmente con il tipo di combustore e il regime operativo (decollo vs crociera).</div>
+</div>
+
+<h3>Tecniche Moderne di Raffreddamento</h3>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" width="100%" style="display:block; padding:12px;">
+  <rect width="720" height="200" fill="transparent"/>
+
+  <!-- Film Cooling -->
+  <text x="90" y="20" fill="#60c0ff" font-family="Rajdhani,sans-serif" font-size="11" text-anchor="middle" font-weight="700">FILM COOLING</text>
+  <rect x="10" y="28" width="160" height="100" rx="8" fill="#1a2535" stroke="#2a4060" stroke-width="1.5"/>
+  <!-- Wall -->
+  <rect x="25" y="50" width="130" height="12" rx="2" fill="#2a4060" stroke="#3a5070" stroke-width="1"/>
+  <!-- Air film arrows -->
+  <g fill="#3d9be9" opacity="0.7">
+    <path d="M40 49 L38 38 L42 38 Z"/>
+    <path d="M65 49 L63 38 L67 38 Z"/>
+    <path d="M90 49 L88 38 L92 38 Z"/>
+    <path d="M115 49 L113 38 L117 38 Z"/>
+    <path d="M140 49 L138 38 L142 38 Z"/>
+  </g>
+  <!-- Film layer -->
+  <rect x="25" y="38" width="130" height="11" rx="1" fill="#3d9be9" opacity="0.15"/>
+  <!-- Hot gas -->
+  <path d="M25 70 L155 70" stroke="#ff6600" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="90" y="85" fill="#ff7a50" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Gas caldi</text>
+  <text x="90" y="105" fill="#60c0ff" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Pellicola d'aria fredda</text>
+  <text x="90" y="118" fill="#406090" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">sulla parete interna</text>
+  <text x="90" y="145" fill="#5090b0" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Semplicità costruttiva</text>
+
+  <!-- Impingement Cooling -->
+  <text x="270" y="20" fill="#40d090" font-family="Rajdhani,sans-serif" font-size="11" text-anchor="middle" font-weight="700">IMPINGEMENT</text>
+  <rect x="185" y="28" width="170" height="100" rx="8" fill="#1a2535" stroke="#2a4060" stroke-width="1.5"/>
+  <!-- Double wall -->
+  <rect x="200" y="60" width="140" height="10" rx="1" fill="#2a4060" stroke="#3a5070"/>
+  <rect x="200" y="80" width="140" height="10" rx="1" fill="#2a4060" stroke="#3a5070"/>
+  <!-- Jet impingement arrows -->
+  <g stroke="#40d090" stroke-width="1.5" fill="none" marker-end="url(#ai)">
+    <line x1="225" y1="55" x2="225" y2="70"/>
+    <line x1="255" y1="55" x2="255" y2="70"/>
+    <line x1="285" y1="55" x2="285" y2="70"/>
+    <line x1="315" y1="55" x2="315" y2="70"/>
+  </g>
+  <defs><marker id="ai" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#40d090"/></marker></defs>
+  <text x="270" y="105" fill="#40d090" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Getti d'aria perpendicolari</text>
+  <text x="270" y="118" fill="#30a070" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">sulla parete interna</text>
+  <text x="270" y="145" fill="#5090b0" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Alta efficienza, doppia parete</text>
+
+  <!-- Transpiration -->
+  <text x="470" y="20" fill="#ffaa30" font-family="Rajdhani,sans-serif" font-size="11" text-anchor="middle" font-weight="700">TRASPIRAZIONE</text>
+  <rect x="390" y="28" width="160" height="100" rx="8" fill="#1a2535" stroke="#2a4060" stroke-width="1.5"/>
+  <!-- Porous wall -->
+  <rect x="405" y="55" width="130" height="14" rx="2" fill="#2a3a50" stroke="#3a5070"/>
+  <!-- Many small holes -->
+  <g fill="#ffaa30" opacity="0.7">
+    <circle cx="415" cy="62" r="1.5"/><circle cx="428" cy="62" r="1.5"/>
+    <circle cx="441" cy="62" r="1.5"/><circle cx="454" cy="62" r="1.5"/>
+    <circle cx="467" cy="62" r="1.5"/><circle cx="480" cy="62" r="1.5"/>
+    <circle cx="493" cy="62" r="1.5"/><circle cx="506" cy="62" r="1.5"/>
+    <circle cx="519" cy="62" r="1.5"/>
+  </g>
+  <!-- Air seeping through -->
+  <g stroke="#ffaa30" stroke-width="0.8" opacity="0.5">
+    <path d="M415 54 L414 47"/><path d="M428 54 L427 47"/>
+    <path d="M441 54 L440 47"/><path d="M454 54 L453 47"/>
+    <path d="M467 54 L466 47"/><path d="M480 54 L479 47"/>
+  </g>
+  <text x="470" y="90" fill="#ffaa30" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Parete porosa microforata</text>
+  <text x="470" y="103" fill="#a07020" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Aria distribuita uniformemente</text>
+  <text x="470" y="145" fill="#5090b0" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Max efficienza, alta complessità</text>
+
+  <!-- Convection label -->
+  <text x="620" y="55" fill="#c060ff" font-family="Rajdhani,sans-serif" font-size="11" text-anchor="middle" font-weight="700">CONVECTION</text>
+  <text x="620" y="70" fill="#c060ff" font-family="Rajdhani,sans-serif" font-size="11" text-anchor="middle" font-weight="700">+ FILM</text>
+  <text x="620" y="93" fill="#906090" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Corrugated strip</text>
+  <text x="620" y="106" fill="#906090" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Combinazione:</text>
+  <text x="620" y="119" fill="#906090" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">convezione interna</text>
+  <text x="620" y="132" fill="#906090" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">+ film esterno</text>
+  <text x="620" y="145" fill="#5090b0" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Standard attuale</text>
+</svg>
+</div>
+
+<div class="data-grid">
+  <div class="data-cell"><span class="val">Film</span><span class="lbl">Pellicola d'aria sulla parete, semplice, meno efficiente</span></div>
+  <div class="data-cell"><span class="val">Impingement</span><span class="lbl">Getti perpendicolari, doppia parete, alta efficienza locale</span></div>
+  <div class="data-cell"><span class="val">Traspirazione</span><span class="lbl">Parete porosa, massima efficienza, alta complessità</span></div>
+  <div class="data-cell"><span class="val">Convection+Film</span><span class="lbl">Standard industriale moderno, buon compromesso</span></div>
+</div>
+
+<div class="example-box">
+  <div class="ex-label">Esempio pratico — Combustori DLE (Dry-Low-Emission)</div>
+  <p>I combustori DLE moderni utilizzano premiscelamento magro per ridurre le emissioni di NOₓ, il che riduce la portata di aria di diluizione disponibile. Questo rende il raffreddamento del liner ancora più critico: i combustori DLE del GE LM6000 usano tecniche combinate di impingement e film cooling con corrugated strip, raggiungendo coefficienti di raffreddamento h > 1000 W/(m²·K). I materiali sono superleghe di nichel (Haynes 230, CMSX-4) con rivestimenti termici (TBC – Thermal Barrier Coating) in ZrO₂.</p>
+</div>
+
+</div>
+`,
+
+combustibili: `
+<div class="modal-header-tag">Carburanti & Impianto</div>
+<h2>Combustibili e Impianto di Alimentazione</h2>
+<div class="modal-divider"></div>
+<div class="modal-body">
+
+<h3>Classificazione dei Combustibili</h3>
+<p>I combustibili sono sostanze principalmente a base di carbonio e idrogeno che reagiscono con l'ossigeno sprigionando energia termica (esotermicità). La loro qualità è misurata tramite il <strong class="hi">potere calorifico</strong> (quantità di calore per unità di massa o volume).</p>
+
+<div class="formula-box">
+  <div class="formula-label">Reazione di Combustione Generale del Cherosene (Jet A-1)</div>
+  <div class="formula-main">
+    C<sub>n</sub>H<sub>m</sub> + (n + m/4) O<sub>2</sub> → n CO<sub>2</sub> + (m/2) H<sub>2</sub>O + Q
+  </div>
+  <div class="formula-note">
+    Approssimazione con n-decano (C₁₀H₂₂): C₁₀H₂₂ + 15.5 O₂ → 10 CO₂ + 11 H₂O + calore<br>
+    Potere calorifico Jet A-1: Q<sub>LHV</sub> ≈ 43.2 MJ/kg &nbsp;·&nbsp; AFR stechiometrico ≈ 14.7:1<br>
+    Combustione reale (eccesso aria TG): AFR ≈ 40–60:1 (globale)
+  </div>
+</div>
+
+<h3>Carburanti Aeronautici Principali</h3>
+
+<div class="data-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px,1fr));">
+  <div class="data-cell">
+    <span class="val" style="font-size:1rem;">Jet A-1</span>
+    <span class="lbl">Cherosene standard turbine. T<sub>congel</sub> ≤ -47°C. Basso zolfo. 43.2 MJ/kg</span>
+  </div>
+  <div class="data-cell">
+    <span class="val" style="font-size:1rem;">Avgas 100LL</span>
+    <span class="lbl">Benzina avio motori a pistoni. Con piombo antidetonante. 44.6 MJ/kg</span>
+  </div>
+  <div class="data-cell">
+    <span class="val" style="font-size:1rem;">JP-8</span>
+    <span class="lbl">Militare NATO, simile al Jet A-1 con additivi anti-corrosione. ~43 MJ/kg</span>
+  </div>
+  <div class="data-cell">
+    <span class="val" style="font-size:1rem;">SAF</span>
+    <span class="lbl">Sustainable Aviation Fuel. Drop-in fino al 50%. Riduzione CO₂ fino a 80%</span>
+  </div>
+</div>
+
+<h3>Impianto di Alimentazione del Combustibile</h3>
+<p>L'impianto combustibile ha lo scopo di stivare il combustibile e portarlo ai motori nelle condizioni di pressione e portata necessarie. I componenti principali sono:</p>
+<ul>
+  <li><strong>Serbatoi</strong>: integrali (ricavati dall'ala), flessibili, rigidi — localizzati prevalentemente nelle ali per centraggio ottimale del velivolo</li>
+  <li><strong>Pompe di trasferimento</strong>: spostano carburante tra serbatoi per mantenere il centraggio</li>
+  <li><strong>Pompe di alimentazione</strong>: centrifughe, immerse nei serbatoi, forniscono la pressione necessaria ai motori</li>
+</ul>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 720 190" xmlns="http://www.w3.org/2000/svg" width="100%" style="display:block; padding:14px;">
+  <rect width="720" height="190" fill="transparent"/>
+  <!-- Aircraft silhouette simplified -->
+  <!-- Fuselage -->
+  <ellipse cx="360" cy="95" rx="200" ry="28" fill="#141c28" stroke="#2a3a55" stroke-width="1.5"/>
+  <!-- Wings -->
+  <path d="M280 95 L80 140 L100 148 L310 100 Z" fill="#1a2535" stroke="#2a3a55" stroke-width="1.5"/>
+  <path d="M440 95 L640 140 L620 148 L430 100 Z" fill="#1a2535" stroke="#2a3a55" stroke-width="1.5"/>
+  <!-- Fuel tanks in wings (highlighted) -->
+  <path d="M200 118 L110 137 L120 143 L215 124 Z" fill="rgba(61,155,233,0.2)" stroke="#3d9be9" stroke-width="1" stroke-dasharray="4,2"/>
+  <path d="M500 118 L590 137 L580 143 L485 124 Z" fill="rgba(61,155,233,0.2)" stroke="#3d9be9" stroke-width="1" stroke-dasharray="4,2"/>
+  <!-- Central tank -->
+  <ellipse cx="360" cy="95" rx="50" ry="18" fill="rgba(61,155,233,0.15)" stroke="#3d9be9" stroke-width="1" stroke-dasharray="3,2"/>
+  <!-- Pumps -->
+  <circle cx="230" cy="120" r="8" fill="#1a3050" stroke="#3d9be9" stroke-width="1.5"/>
+  <text x="230" y="124" fill="#60c0ff" font-family="Rajdhani,sans-serif" font-size="7" text-anchor="middle" font-weight="700">P</text>
+  <circle cx="490" cy="120" r="8" fill="#1a3050" stroke="#3d9be9" stroke-width="1.5"/>
+  <text x="490" y="124" fill="#60c0ff" font-family="Rajdhani,sans-serif" font-size="7" text-anchor="middle" font-weight="700">P</text>
+  <!-- Crossfeed line -->
+  <path d="M238 120 Q360 85 482 120" stroke="#ffaa30" stroke-width="1.5" fill="none" stroke-dasharray="5,3"/>
+  <!-- Engine lines -->
+  <path d="M235 128 L260 160" stroke="#3d9be9" stroke-width="1.5" marker-end="url(#ae)"/>
+  <path d="M485 128 L460 160" stroke="#3d9be9" stroke-width="1.5" marker-end="url(#ae)"/>
+  <rect x="245" y="158" width="30" height="16" rx="4" fill="#1a2535" stroke="#2a4060" stroke-width="1.5"/>
+  <rect x="445" y="158" width="30" height="16" rx="4" fill="#1a2535" stroke="#2a4060" stroke-width="1.5"/>
+  <text x="260" y="169" fill="#5090b0" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">ENG1</text>
+  <text x="460" y="169" fill="#5090b0" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">ENG2</text>
+  <!-- Labels -->
+  <text x="165" y="145" fill="#4090c0" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Serbatoio alare sx</text>
+  <text x="555" y="145" fill="#4090c0" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Serbatoio alare dx</text>
+  <text x="360" y="80" fill="#4090c0" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Serbatoio centrale</text>
+  <text x="360" y="110" fill="#a07020" font-family="Rajdhani,sans-serif" font-size="8" text-anchor="middle">Linea crossfeed</text>
+  <defs><marker id="ae" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#3d9be9"/></marker></defs>
+</svg>
+</div>
+
+<h3>Condizione della Pompa di Alimentazione</h3>
+<div class="formula-box">
+  <div class="formula-label">Intervallo di Funzionamento della Pompa</div>
+  <div class="formula-main">
+    per Q<sub>MIN</sub> ≤ Q ≤ Q<sub>MAX</sub> :<br>
+    p<sub>MIN</sub> + Δp(Q) ≤ p<sub>P</sub> ≤ p<sub>MAX</sub> + Δp(Q)
+  </div>
+  <div class="formula-note">
+    p<sub>P</sub> = pressione erogata dalla pompa &nbsp;·&nbsp; Δp(Q) = perdite di carico nei condotti (∝ Q²)<br>
+    Q<sub>MIN</sub>, Q<sub>MAX</sub> = portata minima e massima richiesta dal motore<br>
+    La condizione garantisce il funzionamento senza flame-out per tutte le portate operative.
+  </div>
+</div>
+
+<div class="example-box">
+  <div class="ex-label">Esempio — Boeing 777 e Sonde Ultrasoniche</div>
+  <p>Il Boeing 777 utilizza sonde ultasoniche per la misura del livello di carburante: segnali riflessi dal pelo libero del carburante determinano il livello con precisione superiore alle tradizionali sonde a galleggiante o capacitive. Il sistema gestisce 5 serbatoi (2 alari, 1 centrale, 2 reserve) con un sistema crossfeed che permette di alimentare qualsiasi motore da qualsiasi serbatoio, garantendo autonomia e centraggio anche in caso di avaria singola.</p>
+</div>
+
+</div>
+`,
+
+italiano: `
+<div class="modal-header-tag" style="color:#c060e0;">Italiano — Letteratura del Novecento</div>
+<h2>Pirandello e il Progresso Tecnologico</h2>
+<div class="modal-divider" style="background:linear-gradient(90deg,#c060e0,#60c0ff,transparent);"></div>
+<div class="modal-body">
+
+<p>Luigi Pirandello visse e scrisse nel periodo in cui il progresso tecnologico stava trasformando radicalmente la società europea. L'aviazione nasceva, le industrie crescevano, le macchine ridisegnavano il lavoro e la vita quotidiana. Questo contesto è inseparabile dalla sua visione dell'uomo moderno.</p>
+
+<h3 style="color:#c060e0;">Vita</h3>
+<div class="collegamento-grid">
+  <div class="coll-item"><div class="coll-icon">🗓️</div><div class="coll-label">1867</div><div class="coll-sub">Nasce ad Agrigento, Sicilia</div></div>
+  <div class="coll-item"><div class="coll-icon">✍️</div><div class="coll-label">Formazione</div><div class="coll-sub">Lettere e filosofia a Roma e Bonn</div></div>
+  <div class="coll-item"><div class="coll-icon">🏆</div><div class="coll-label">1934</div><div class="coll-sub">Premio Nobel per la Letteratura</div></div>
+  <div class="coll-item"><div class="coll-icon">⚰️</div><div class="coll-label">1936</div><div class="coll-sub">Muore a Roma</div></div>
+</div>
+
+<p>Durante la sua vita assistette a trasformazioni epocali: lo sviluppo industriale, il progresso tecnologico, la nascita della società moderna di massa e la Prima guerra mondiale. Tutti questi cambiamenti alimentarono il suo senso di <strong class="hi">smarrimento esistenziale</strong>.</p>
+
+<h3 style="color:#c060e0;">Il Pensiero: La Maschera e l'Identità</h3>
+<p>Il nucleo del pensiero pirandelliano è la <strong class="hi">crisi dell'identità</strong>. Ogni individuo indossa una "maschera" diversa a seconda del contesto sociale in cui si trova, perdendo il contatto con il proprio sé autentico.</p>
+
+<div class="quote-block">
+  "Uno per sé stesso, centomila per gli altri, nessuno perché non possiede una vera identità stabile."
+  <cite>— Sintesi del romanzo <em>Uno, nessuno e centomila</em> (1926)</cite>
+</div>
+
+<p>Secondo Pirandello:</p>
+<ul>
+  <li>Nessuno possiede una sola identità fissa e stabile</li>
+  <li>La realtà cambia a seconda del punto di vista dell'osservatore (<strong class="hi">relativismo della verità</strong>)</li>
+  <li>L'uomo moderno è condannato alla solitudine e all'incomprensione reciproca</li>
+  <li>Spesso la follia è più autentica della "normalità" sociale</li>
+</ul>
+
+<h3 style="color:#c060e0;">Opere Principali</h3>
+
+<div class="example-box" style="border-left-color:#c060e0; background:rgba(180,80,200,0.06); border-color:rgba(180,80,200,0.2);">
+  <div class="ex-label" style="color:#c060e0;">Il fu Mattia Pascal (1904)</div>
+  <p>Un uomo approfitta di una falsa morte per ricominciare con una nuova identità, ma scopre che senza documenti, senza passato, senza nome riconosciuto dalla società, l'individuo non esiste. La libertà assoluta si rivela una prigione peggiore. <strong>Collegamento:</strong> come un aereo senza codice di volo o transponder — tecnicamente in volo, ma invisibile al sistema.</p>
+</div>
+
+<div class="example-box" style="border-left-color:#c060e0; background:rgba(180,80,200,0.06); border-color:rgba(180,80,200,0.2);">
+  <div class="ex-label" style="color:#c060e0;">Uno, nessuno e centomila (1926)</div>
+  <p>Vitangelo Moscarda scopre che ogni persona lo vede in modo diverso. Decide di distruggere tutte le sue "maschere" sociali per trovare l'io autentico, ma la ricerca lo porta alla dissoluzione totale dell'identità. È il romanzo che meglio rappresenta il <strong>relativismo pirandelliano</strong>.</p>
+</div>
+
+<div class="example-box" style="border-left-color:#c060e0; background:rgba(180,80,200,0.06); border-color:rgba(180,80,200,0.2);">
+  <div class="ex-label" style="color:#c060e0;">Sei personaggi in cerca d'autore (1921)</div>
+  <p>Sei personaggi irrrompono su un palcoscenico cercando un autore che dia forma alla loro storia. Pirandello mette in crisi la distinzione tra realtà e finzione, tra vita e teatro. Opera rivoluzionaria che anticipa il teatro dell'assurdo del Novecento.</p>
+</div>
+
+<h3 style="color:#c060e0;">Collegamento con l'Aviazione e il Progresso Tecnologico</h3>
+<p>Pirandello visse esattamente negli anni in cui il volo motorizzato passava da esperimento (Wright, 1903) a realtà industriale. La società si trasformava a velocità mai viste prima. Questo accelerazione tecnologica è il <strong class="hi">contesto storico diretto</strong> della sua crisi esistenziale:</p>
+
+<div class="collegamento-grid">
+  <div class="coll-item">
+    <div class="coll-icon">✈️</div>
+    <div class="coll-label">Aviazione nascente</div>
+    <div class="coll-sub">L'uomo conquistava il cielo mentre perdeva se stesso a terra</div>
+  </div>
+  <div class="coll-item">
+    <div class="coll-icon">🏭</div>
+    <div class="coll-label">Industria</div>
+    <div class="coll-sub">La macchina sostituisce l'artigiano: identità professionale in crisi</div>
+  </div>
+  <div class="coll-item">
+    <div class="coll-icon">⚙️</div>
+    <div class="coll-label">Meccanizzazione</div>
+    <div class="coll-sub">L'uomo diventa ingranaggio: perde autonomia e unicità</div>
+  </div>
+  <div class="coll-item">
+    <div class="coll-icon">🌍</div>
+    <div class="coll-label">Società di massa</div>
+    <div class="coll-sub">L'individuo si dissolve nella folla anonima della modernità</div>
+  </div>
+</div>
+
+<div class="formula-box" style="border-color:rgba(180,80,200,0.3); background:rgba(180,80,200,0.06);">
+  <div class="formula-label" style="color:#c060e0;">Schema del collegamento per la maturità</div>
+  <div class="formula-main" style="font-size:1rem; line-height:2;">
+    Progresso tecnologico (aviazione, industria) → società che cambia troppo in fretta<br>
+    → l'individuo perde punti di riferimento → crisi d'identità (Pirandello)<br>
+    → la "maschera" come meccanismo di adattamento → alienazione moderna
+  </div>
+</div>
+
+<h3 style="color:#c060e0;">Stile Letterario</h3>
+<ul>
+  <li><strong>Linguaggio realistico e psicologico</strong>: dialoghi ricchi, analisi interiore profonda</li>
+  <li><strong>Umorismo pirandelliano</strong>: non comicità, ma il "sentimento del contrario" — si ride e ci si addolora contemporaneamente</li>
+  <li><strong>Strutture narrative innovative</strong>: narratori inaffidabili, finali aperti, rottura della quarta parete nel teatro</li>
+  <li><strong>Influenza sul Novecento</strong>: precursore dell'esistenzialismo, del teatro dell'assurdo (Beckett, Ionesco), del postmodernismo</li>
+</ul>
+
+</div>
+`,
+
+inglese: `
+<div class="modal-header-tag" style="color:#40c880;">English — Aviation Fuel</div>
+<h2>Aircraft Fuel Systems in English</h2>
+<div class="modal-divider" style="background:linear-gradient(90deg,#40c880,#60c0ff,transparent);"></div>
+<div class="modal-body">
+
+<p>Aviation uses special fuels that are more refined than normal fuels. They have strict quality controls and contain additives to make them safe at high altitude and low temperatures.</p>
+
+<h3 style="color:#40c880;">Key Words</h3>
+
+<div class="vocab-grid">
+  <div class="vocab-item"><span class="vocab-en">fuel</span><span class="vocab-it">carburante</span></div>
+  <div class="vocab-item"><span class="vocab-en">jet fuel</span><span class="vocab-it">cherosene per turbine</span></div>
+  <div class="vocab-item"><span class="vocab-en">fuel tank</span><span class="vocab-it">serbatoio</span></div>
+  <div class="vocab-item"><span class="vocab-en">fuel pump</span><span class="vocab-it">pompa carburante</span></div>
+  <div class="vocab-item"><span class="vocab-en">combustion chamber</span><span class="vocab-it">camera di combustione</span></div>
+  <div class="vocab-item"><span class="vocab-en">thrust</span><span class="vocab-it">spinta</span></div>
+  <div class="vocab-item"><span class="vocab-en">crossfeed valve</span><span class="vocab-it">valvola incrociata</span></div>
+  <div class="vocab-item"><span class="vocab-en">refueling</span><span class="vocab-it">rifornimento</span></div>
+  <div class="vocab-item"><span class="vocab-en">fuel leak</span><span class="vocab-it">perdita di carburante</span></div>
+  <div class="vocab-item"><span class="vocab-en">fuel starvation</span><span class="vocab-it">mancanza carburante al motore</span></div>
+</div>
+
+<h3 style="color:#40c880;">What is the Fuel System?</h3>
+
+<div class="en-example">
+  <div class="en-src">From the textbook — Module 6, Unit 3</div>
+  The fuels used in aviation are special types of <strong>petroleum-based fuel</strong>. They are highly refined and contain additives which reduce the risk of icing at low temperatures. The two main types are <strong>AVGAS</strong> (for piston engines) and <strong>jet fuel</strong> (for turbine engines).
+</div>
+
+<p>The fuel system stores fuel in tanks (usually in the wings) and delivers it to the engines using pumps and valves. A <strong>crossfeed valve</strong> allows fuel from one wing to feed the opposite engine — useful if one engine fails.</p>
+
+<h3 style="color:#40c880;">Fuel Problems</h3>
+<ul>
+  <li><strong class="hi-teal">Fuel Leak</strong> — fuel escapes from the tank or line. The pilot may need to shut down the affected engine.</li>
+  <li><strong class="hi-teal">Fuel Imbalance</strong> — unequal fuel in the two wings, making the aircraft hard to control.</li>
+  <li><strong class="hi-teal">Fuel Freezing</strong> — at high altitude the temperature is very low. Jet A-1 is safe down to −47°C.</li>
+  <li><strong class="hi-teal">Fuel Exhaustion vs Starvation</strong> — exhaustion: no fuel left on board. Starvation: fuel is there but cannot reach the engine.</li>
+</ul>
+
+<h3 style="color:#40c880;">Fuel Planning (EASA)</h3>
+<p>Before every flight, the captain must check that the aircraft carries enough fuel for the whole trip, plus extra for emergencies:</p>
+
+<div class="collegamento-grid">
+  <div class="coll-item"><div class="coll-icon">🛫</div><div class="coll-label">Trip Fuel</div><div class="coll-sub">For the planned route</div></div>
+  <div class="coll-item"><div class="coll-icon">🔀</div><div class="coll-label">Diversion Fuel</div><div class="coll-sub">To fly to an alternate airport</div></div>
+  <div class="coll-item"><div class="coll-icon">🛡️</div><div class="coll-label">Reserve Fuel</div><div class="coll-sub">Minimum safety reserve (30 min)</div></div>
+  <div class="coll-item"><div class="coll-icon">⚠️</div><div class="coll-label">Contingency Fuel</div><div class="coll-sub">For unexpected delays or weather</div></div>
+</div>
+
+<h3 style="color:#40c880;">Link to the Combustion Chamber</h3>
+<p>The fuel system delivers Jet A-1 to the engine, where it is sprayed as a fine mist into the <strong>combustion chamber</strong>. There it mixes with compressed air and burns, producing hot gas that spins the turbine and generates thrust. Without a reliable fuel supply, the engine cannot work.</p>
+
+</div>
+`
+
+};
+
+// ======= MODAL LOGIC =======
+function openModal(key) {
+  document.getElementById('modalBody').innerHTML = modals[key];
+  document.getElementById('modalOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ======= SCROLL REVEAL =======
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.card').forEach(card => {
+  card.style.opacity = '0';
+  card.style.transform = 'translateY(20px)';
+  card.style.transition = 'opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s ease, border-color 0.3s ease';
+  observer.observe(card);
+});
+</script>
+</body>
+</html>
